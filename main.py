@@ -1,9 +1,15 @@
 import os
+import sys
 import logging
 from datetime import datetime
 import random
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
+
+# Check Python version compatibility
+if sys.version_info >= (3, 13):
+    print("Warning: Python 3.13 may have compatibility issues with python-telegram-bot 20.7")
+    print("Consider using Python 3.12 or upgrading python-telegram-bot")
 
 # Enable logging
 logging.basicConfig(
@@ -242,25 +248,33 @@ def main() -> None:
         logger.error("TELEGRAM_BOT_TOKEN environment variable not set!")
         return
     
-    # Create the Application
-    application = Application.builder().token(token).build()
-    
-    # Add command handlers
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("report", report_command))
-    
-    # Log bot startup
-    logger.info("Bot starting...")
-    
-    # Run the bot
-    port = int(os.environ.get("PORT", 8080))
-    application.run_webhook(
-        listen="0.0.0.0",
-        port=port,
-        url_path=token,
-        webhook_url=f"https://bot-02-j1ma.onrender.com/{token}"
-    )
+    try:
+        # Create the Application with error handling for Python 3.13
+        application = Application.builder().token(token).build()
+        
+        # Add command handlers
+        application.add_handler(CommandHandler("start", start))
+        application.add_handler(CommandHandler("help", help_command))
+        application.add_handler(CommandHandler("report", report_command))
+        
+        # Log bot startup
+        logger.info("Bot starting...")
+        
+        # Run the bot
+        port = int(os.environ.get("PORT", 8080))
+        application.run_webhook(
+            listen="0.0.0.0",
+            port=port,
+            url_path=token,
+            webhook_url=f"https://bot-02-j1ma.onrender.com/{token}"
+        )
+        
+    except Exception as e:
+        logger.error(f"Failed to start bot: {e}")
+        if "polling_cleanup_cb" in str(e):
+            logger.error("This error is likely due to Python 3.13 compatibility issues.")
+            logger.error("Try using Python 3.12 or upgrade python-telegram-bot to version 21.0+")
+        raise
 
 if __name__ == '__main__':
     main()
