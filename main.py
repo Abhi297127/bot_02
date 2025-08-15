@@ -259,7 +259,7 @@ def main() -> None:
         listen="0.0.0.0",
         port=port,
         url_path=token,
-        webhook_url=f"https://your-app-name.onrender.com/{token}"
+        webhook_url=f"https://bot-02-j1ma.onrender.com/{token}"
     )
 
 if __name__ == '__main__':
