@@ -249,7 +249,7 @@ def main() -> None:
         return
     
     try:
-        # Create the Application with error handling for Python 3.13
+        # Create the Application
         application = Application.builder().token(token).build()
         
         # Add command handlers
@@ -260,13 +260,11 @@ def main() -> None:
         # Log bot startup
         logger.info("Bot starting...")
         
-        # Run the bot
-        port = int(os.environ.get("PORT", 8080))
-        application.run_webhook(
-            listen="0.0.0.0",
-            port=port,
-            url_path=token,
-            webhook_url=f"https://bot-02-j1ma.onrender.com/{token}"
+        # Use polling instead of webhooks for simplicity
+        # This works better in many hosting environments
+        application.run_polling(
+            drop_pending_updates=True,  # Drop any pending updates on startup
+            allowed_updates=Update.ALL_TYPES
         )
         
     except Exception as e:
